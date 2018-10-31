@@ -1,0 +1,151 @@
+//服务器程序
+// PipeServer.cpp : Defines the entry point for the console application.
+//
+#include "stdafx.h"
+#include "PipeServer.h"
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+/////////////////////////////////////////////////////////////////////////////
+// The one and only application object
+
+CWinApp theApp;
+using namespace std;
+
+int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
+{
+	int nRetCode = 0;
+	int err;
+	BOOL rc;
+	HANDLE hPipeHandle1;
+	char lpName[] = "\\\\.\\pipe\\myPipe";
+	char InBuffer[50] = "";
+	char OutBuffer[50] = "";
+	DWORD BytesRead, BytesWrite;
+
+	hPipeHandle1 = CreateNamedPipe(
+		(LPCTSTR)lpName,
+		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED | WRITE_DAC,
+		PIPE_TYPE_MESSAGE | PIPE_READMODE_BYTE | PIPE_WAIT,
+		1, 20, 30, NMPWAIT_USE_DEFAULT_WAIT,
+		(LPSECURITY_ATTRIBUTES)NULL
+	);
+
+	if ((hPipeHandle1 == INVALID_HANDLE_VALUE) || (hPipeHandle1 == NULL))
+	{
+		err = GetLastError();
+		printf("Server Pipe Create Fail!err=%d\n", err);
+		exit(1);
+	}
+	else
+		printf("Server Pipe Create Success!\n");
+	while (1)
+	{
+		rc = ConnectNamedPipe(hPipeHandle1, (LPOVERLAPPED)NULL);
+		if (rc == 0)
+		{
+			err = GetLastError();
+			printf("Server Pipe Connect Fail!err=%d\n", err);
+			exit(2);
+		}
+		else
+			printf("Server Pipe Connect Success\n");
+		strcpy(InBuffer, "");
+		strcpy(OutBuffer, "");
+		rc = ReadFile(hPipeHandle1, InBuffer, sizeof(InBuffer), &BytesRead,
+			(LPOVERLAPPED)NULL);
+		if (rc == 0 && BytesRead == 0)
+		{
+			err = GetLastError();
+			printf("Server Read Pipe Fail!err=%d\n", err);
+			exit(3);
+		}
+		else
+			printf("Server Read Pipe Success!\nDATA from Client is=%s\n", InBuffer);
+		rc = strcmp(InBuffer, "end");
+		if (rc == 0)
+			break;
+		printf("Please Input Data to Send\n");
+		scanf("%s", OutBuffer);
+		rc = WriteFile(hPipeHandle1, OutBuffer, sizeof(OutBuffer), &BytesWrite,
+			(LPOVERLAPPED)NULL);
+		if (rc == 0)
+			printf("Server Write Pipe Fail!\n");
+		else
+			printf("Server Write Pipe Success!\n");
+		DisconnectNamedPipe(hPipeHandle1);
+		rc = strcmp(OutBuffer, "end");
+		if (rc == 0)
+			break;
+	}
+	printf("Now Server be END!\n");
+	CloseHandle(hPipeHandle1);
+	return nRetCode;
+}
+
+//客户端程序
+// PipeClient.cpp : Defines the entry point for the console application.
+//
+#include "stdafx.h"
+#include "PipeClient.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+// The one and only application object
+CWinApp theApp;
+using namespace std;
+int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
+{
+	int nRetCode = 0;
+	int err = 0;
+	BOOL rc = 0;
+	char lpName[] = "\\\\.\\pipe\\myPipe";
+	char InBuffer[50] = "";
+	char OutBuffer[50] = "";
+	DWORD BytesRead;
+	while (1)
+	{
+		strcpy(InBuffer, "");
+		strcpy(OutBuffer, "");
+		printf("Input Data Please!\n");
+		scanf("%s", InBuffer);
+		rc = strcmp(InBuffer, "end");
+		if (rc = 0)
+		{
+			rc = CallNamedPipe(lpName, InBuffer, sizeof(InBuffer), OutBuffer,
+				sizeof(OutBuffer), &BytesRead, NMPWAIT_USE_DEFAULT_WAIT);
+			break;
+		}
+		rc = WaitNamedPipe(lpName, NMPWAIT_WAIT_FOREVER);
+		if (rc == 0)
+		{
+			err = GetLastError();
+			printf("Wait Pipe Fail!err=%d\n", err);
+			exit(1);
+		}
+		else
+			printf("Wait Pipe Success\n");
+		rc = CallNamedPipe(lpName, InBuffer, sizeof(InBuffer), OutBuffer,
+			sizeof(OutBuffer), &BytesRead, NMPWAIT_USE_DEFAULT_WAIT);
+		rc = strcmp(OutBuffer, "end");
+		if (rc == 0)
+			break;
+		if (rc == 0)
+		{
+			err = GetLastError();
+			printf("Pipe Call Fail!err=%d\n", err);
+			exit(1);
+		}
+		else
+			printf("Pipe Call Success!\nDATA from Server is=%s\n", OutBuffer);
+	}
+	printf("Now Client be END!\n");
+	return nRetCode;
+}

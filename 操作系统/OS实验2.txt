@@ -1,0 +1,72 @@
+//Semaphore.cpp:Define the entry point for the console application.
+#include "stdafx.h"
+#include "操作系统.h"
+
+#ifdef _DEBUG
+#define new DUBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+//////////////////////////////////////////////////////////
+//CWinApp theApp;
+using namespace std;
+
+static HANDLE h1;
+static HANDLE hHandle1 = NULL;
+
+void func();
+
+int _tmain(int argc, TCHAR*atgv[], TCHAR*envp[])
+{
+
+	int nRetCode = 0;
+	DWORD dwThreadID1;
+	DWORD dRes, err;
+
+	hHandle1 = CreateSemaphore(NULL, 0, 1, LPCWSTR("SemaphoreName1"));  //创建一个信号量
+	if (hHandle1 == NULL)printf("Semaphore Create Fail!\n");
+	else printf("Semaphore Create Success!\n");
+
+	hHandle1 = OpenSemaphore(SYNCHRONIZE | SEMAPHORE_MODIFY_STATE,
+		NULL,
+		LPCWSTR("SemaphoreName1"));
+	if (hHandle1 == NULL)printf("Semaphore Open Fail!\n");
+	else printf("Semaphore Open Success!\n");
+
+	h1 = CreateThread((LPSECURITY_ATTRIBUTES)NULL,
+		0,
+		(LPTHREAD_START_ROUTINE)func,
+		(LPVOID)NULL,
+		0, &dwThreadID1);
+	if (h1 == NULL)printf("Thread1 create Fail!\n");
+	else printf("Thread1 create Success!\n");
+
+	dRes = WaitForSingleObject(hHandle1, INFINITE);
+	err = GetLastError();
+	printf("WaitForSingleObject err = %d\n", err);
+
+	if (dRes == WAIT_TIMEOUT)printf("TIMEOUT!dRes = %d\n", dRes);
+	else if (dRes == WAIT_OBJECT_0)printf("WAIT_OBJECT!dRes = %d\n", dRes);
+	else if (dRes == WAIT_ABANDONED)
+		printf("WAIT_ABANDONED!dRes = %d\n", dRes);
+	else printf("dRes = %d\n", dRes);
+
+	CloseHandle(h1);
+	CloseHandle(hHandle1);
+	ExitThread(0);
+
+	return nRetCode;
+}
+
+void func()
+{
+	BOOL rc;
+	DWORD err;
+
+	printf("Now In Thread!\n");
+	rc = ReleaseSemaphore(hHandle1, 1, NULL);
+	err = GetLastError();
+	printf("ReleaseSemaphore err = %d\n", err);
+	if (rc == 0)printf("Semaphore Release Fail!\n");
+	else printf("Semaphore Release Success!rc = %d\n", rc);
+}

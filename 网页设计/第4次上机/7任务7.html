@@ -1,0 +1,85 @@
+<html lang="en">
+	<head>
+		<title>是否在线检测网页</title>
+		<script type="text/javascript">
+			//时钟
+			window.onload = function() 
+			{  
+				var days = document.getElementById("days");  
+				var times = document.getElementById("times");  
+				
+				setInterval(function() 
+				{   
+					var time = new Date();   // 程序计时的月从0开始取值后+1   
+					var m = time.getMonth() + 1;   
+					var day = time.getFullYear()+"-"+m+"-"+time.getDate();
+
+					var t=time.getHours()+":"+time.getMinutes()+":"+time.getSeconds();   
+					days.innerHTML = day;
+					times.innerHTML = t;  
+				}, 1000); 
+			};
+		</script>
+		<script>
+			//打开新页面--属性设置
+			function OpenWindow(url,w,h)
+			{
+			    var left=Math.round((window.screen.availWidth-w)/2);
+			    var top=Math.round((window.screen.availHeight-100-h)/2);
+			    var MyWin=window.open(url, "", "height="+h+", width="+w+",top="+top+",left="+left+", toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");
+			}
+		</script>
+		<script type="text/javascript"> 
+			//倒计时
+			var t=10;
+			var count=20;
+			setInterval("refer()",1000); //每秒钟调用一次refer()
+
+			function refer()
+			{ 
+				if(t==0)
+				{
+					//倒计时结束 跳转页面
+					OpenWindow("7本人在页面.html",400,400);
+				} 
+				if(count==0)
+				{
+					window.close();
+				}
+				if(count>10)
+				{
+					document.getElementById('shows').innerHTML=""+t+"秒后弹出询问页面";
+				}
+				if(count<=10)
+				{
+					document.getElementById('shows').innerHTML=""+count+"秒后关闭页面,请点击按钮保留当前页面";
+				}
+				if(t>=0)
+				{
+					t--;
+					count--;
+				}
+				if(count>=0&&count<10)
+				{
+					count--;
+				}
+			} 
+			function Stay()
+			{
+				t=10;count=20;
+			}
+		</script>
+	</head>
+	<body bgcolor="#7D7DFF">
+		<font color="white"><h1 style="text-align: center"><br>这是一个网页</h1>
+		<p style="font-size:20px;margin-left:100px;margin-right: 100px">设计一种网页访问者是否还在检测网站，设计一个简易时钟，但还需要显示年份月份和日期，如2018年12月12日。添加一个按钮名称为“本人在”。从网页打开起10秒后弹出无滚动条、无状态栏、宽度高度均为400的新窗口，显示“您好，请问您还在吗？”，若访问者在又一个10秒内没有点击“本人在”按钮，则页面自动关闭。</p>
+		<div id="days" style="font-size: 20px;text-align: center"></div>
+		<div id="times" style="font-size: 20px;text-align: center"></div>
+		<br><br>
+		<div align="center"><input type="button"  value="本人在" onclick="Stay()" /><br><br>
+		<span id="shows"></span></div>
+		</font>
+	</body>
+
+
+</html>

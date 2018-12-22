@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>您还在吗？</title>
+	<script type="text/javascript"> 
+			var t=8;
+			setInterval("refer()",1000); 
+			function refer(){ 
+			 if(t==0)
+			 { 
+			 	//location.href="";
+			 	window.close();
+			 } 
+			 document.getElementById('shows').innerHTML=""+t+"秒后将关闭前一页面";
+			 if(t>=0){t--;}
+			} 
+		</script>
+		<script type="text/javascript" src="7任务7.html"></script>
+
+</head>
+<body onUnload="myClose()">
+	<div align="center"><h1>您好，请问您还在吗？</h1>
+		<br>
+		<input type="button" value="关闭窗口" onclick="window.close()" />
+		<br><br><br><br><br>
+		<span id="shows"></span>
+	</div>
+</body>
+
+</html>

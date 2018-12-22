@@ -1,0 +1,104 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>机动车号牌限行检测</title>
+	<style type="text/css">
+
+  	html, body { height: 100%; background: white; margin: 0;}
+  	.container {
+      	display: -webkit-flex;
+      	display: flex;
+      	-webkit-flex-flow: row;
+      	flex-flow: row;
+      
+      	max-width: 1000px;
+     	height: 100%;
+      	margin: auto;
+  	}
+  	.main {
+      	width: 60%;
+      	margin: 20px 0;
+      	padding: 7px;
+      	background: #AFEEEE;
+  	}
+  	.left {
+     	-webkit-flex: 1;
+     	flex: 1;
+  	}
+  	.right {
+     	-webkit-flex: 2;
+     	flex: 2;
+  	}
+  	.nav {
+     	margin: 20px 15px;
+     	padding: 7px;
+     
+     	background: #48D1CC; 
+  	}
+  	</style>
+
+	<script type="text/javascript">
+
+	    function getDate(format)
+	    {
+	      	var now = new Date();
+	      	var date = now.getDate();//得到日期
+	      	return date;
+	    }
+
+    	function checkLimie()
+    	{
+    
+	        var input=document.getElementById("myId");//通过id获取文本框对象
+	        
+	        if(!input.value)
+	        {
+	          alert("请输入您的车牌号！");
+	        }
+	        else if(input.value.length<7)
+	        {
+	          alert("请输入正确的车牌号！");
+	        }
+	        else
+	        {
+	          	var n=input.value.substr(input.value.length-3,3)
+	          	if(n%getDate()==0)
+	          	{
+	            	alert("今天禁止上路!");
+	          	}
+	          	else
+	          	{
+	            	alert("今日允许上路!");
+	          	}
+        	}
+    	}
+    	function displayDate()
+    	{
+      		document.getElementById("demo").innerHTML=Date();
+    	}
+	</script>
+</head>
+<body>
+  	<div class="container">
+	  	<nav class="nav left">
+	      	<h1>当前时间</h1>
+	      	<p id="demo">点击刷新时间</p>
+	      	<button type="button" onclick="displayDate()">刷新时间</button>
+	  	</nav>
+	  	<section class="main" align="center">
+	      	<br><hr size = 2 width = 80% color = "#48D1CC">
+	      	<h1><font color="teal">机动车号牌限行检测网站</font></h1>
+	      	<hr size = 2 width = 80% color = "#48D1CC">
+	      	<br>
+	      	<input type="text" placeholder="请输入您的车牌号" id="myId"></center>
+	      	<br>
+	      	<br>
+	      	<input type="button" value="检测" onClick="checkLimie()"/>
+	  	</section>
+	  	<nav class="nav right">
+	      	<h1>限行规则</h1>
+	      	<p>设计一种机动车车牌限行检测网站，机动车牌最末三位数字能够整除当天所在的日期，则禁止在当天上路。</p>
+	  	</nav>
+	</div>
+</body>
+</html>
